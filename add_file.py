@@ -10,6 +10,7 @@ def upload_file(File):
     url = 'http://localhost:3240'
     files = {'file': open(File)}
     req = requests.put(url, files=files)
+    req.raise_for_status()
 
 if __name__ == "__main__":
     file_to_upload = raw_input("File to upload?")
