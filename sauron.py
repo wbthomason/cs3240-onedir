@@ -30,7 +30,7 @@ class Sauron(Daemon):
 		while True:
 			time.sleep(15)
 			self.last_check = time.clock()
-			check_updates(self.last_check, self.user.auth_key)	
+			check_updates(self.last_check, self.user.auth_key, self.dir)	
 
 if __name__ == "__main__":
 	if len(sys.argv) == 3:
