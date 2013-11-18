@@ -5,9 +5,13 @@ import time
 from file_transfer import *
 
 class DirectoryWatcher( FileSystemEventHandler ):
+	def __init__(self, user):
+		FileSystemEventHandler.__init__(self)
+		self.user = user
+
 	def on_created(self, event):
 		if not event.is_directory:
-			file_upload(event.src_path)
+			file_upload(event.src_path, self.user)
 		else:
 			# Do we need to handle directories?
 			pass
@@ -22,7 +26,7 @@ class DirectoryWatcher( FileSystemEventHandler ):
 
 	def on_modified(self, event):
 		if not event.is_directory:
-			file_upload(event.src_path)
+			file_upload(event.src_path, self.user)
 		else:
 			# Do we need to handle directories?
 			pass
@@ -30,7 +34,7 @@ class DirectoryWatcher( FileSystemEventHandler ):
 	def on_moved(self, event):
 		if not event.is_directory:
 			file_delete(event.src_path)
-			file_upload(event.dest_path)
+			file_upload(event.dest_path, self.user)
 		else:
 			# Do we need to handle directories?
 			pass

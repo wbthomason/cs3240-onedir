@@ -6,9 +6,9 @@ import MySQLdb as mdb
 import sys
 
 
-def upload_file(File):
-    url = 'http://localhost:3240'
-    files = {'file': open(File)}
+def upload_file(file, user):
+    url = 'http://localhost:3240/files/'
+    files = {'file': open(file), 'filename':file[len(user.dir):], 'username':user.email}
     req = requests.put(url, files=files)
     req.raise_for_status()
 

@@ -9,11 +9,10 @@ from file_transfer import *
 from user import User
 
 class Sauron(Daemon):
-	def __init__(self, directory, user):
+	def __init__(self, user):
 		Daemon.__init__(self, '/tmp/daemon-example.pid', sys.stdin, sys.stdout, sys.stderr)
-		self.dir = directory
 		self.user = user
-		self.last_check = None
+		self.last_check = 0.0
 	
 	def run(self):
 		if not self.user.login():
@@ -23,23 +22,23 @@ class Sauron(Daemon):
 		# Set up file watcher
 		file_events = DirectoryWatcher()
 		dir_observer = Observer()
-		dir_observer.schedule(file_events, path=self.dir, recursive=True)
+		dir_observer.schedule(file_events, path=self.user.dir, recursive=True)
 		dir_observer.start()
 		
 		# Watch server for updates
 		while True:
 			time.sleep(15)
-			self.last_check = time.clock()
-			check_updates(self.last_check, self.user.auth_key, self.dir)	
+			self.last_check = time.time()
+			check_updates(self.last_check, self.user)	
 
 if __name__ == "__main__":
 	if len(sys.argv) == 3:
 		if 'start' == sys.argv[1]:
 			email = raw_input("Email: ")
 			password = raw_input("Password: ")
-			user = User(email, password)
+			user = User(email, password, sys.argv[2])
 			
-			daemon = Sauron(sys.argv[2], user)
+			daemon = Sauron(user)
 			daemon.start()
 		elif 'stop' == sys.argv[1]:
 			daemon = Sauron(sys.argv[2], None)
