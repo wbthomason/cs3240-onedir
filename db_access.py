@@ -6,11 +6,10 @@ import MySQLdb as mdb
 
 
 def connect():
-    return mdb.connect('stardock.cs.virginia.edu', 'cs4720dhk3yt', 'fall2013', 'cs4720dhk3yt');
+    return mdb.connect('stardock.cs.virginia.edu', 'cs4720dhk3yt', 'fall2013', 'cs4720dhk3yt')
 
 
-def create_account(email, password):
-    db = connect()
+def create_account(email, password, db):
     cur = db.cursor()
 
     create_new_user = "INSERT INTO local_users( email, password ) VALUES ( '%s', '%s' )" % ( email, password )
@@ -18,8 +17,7 @@ def create_account(email, password):
     db.commit()
 
 
-def login(email, password):
-    db = connect()
+def login(email, password, db):
     cur = db.cursor()
 
     get_login = "SELECT password FROM local_users WHERE email='%s'" % (email)
@@ -29,8 +27,7 @@ def login(email, password):
     return password == res[0]
 
 
-def get_dirs(email):
-    db = connect()
+def get_dirs(email, db):
     cur = db.cursor()
 
     get_dirs = "SELECT dirs FROM local_users WHERE email='%s'" % (email)
@@ -43,14 +40,13 @@ def get_dirs(email):
         return []
 
 
-def set_dirs(email, dirs):
+def set_dirs(email, dirs, db):
     new_dirs = ""
     for i in range(len(dirs) - 1):
         new_dirs += dirs[i] + ','
 
     new_dirs += dirs[-1]
 
-    db = connect()
     cur = db.cursor()
 
     update_dirs = "UPDATE local_users SET dirs='%s' WHERE email='%s'" % (new_dirs, email)
@@ -58,15 +54,20 @@ def set_dirs(email, dirs):
     db.commit()
 
 
-def add_dir(email, dir):
-    dirs = get_dirs(email)
+def get_id(email, db):
+    cur = db.cursor()
+    cur.execute("SELECT id FROM local_users WHERE email='%s'" % email)
+    return cur.fetchone()[0]
+
+
+def add_dir(email, dir, db):
+    dirs = get_dirs(email, db)
     dirs.append(dir)
 
-    set_dirs(email, dirs)
+    set_dirs(email, dirs, db)
 
 
-def get_files(email):
-    db = connect()
+def get_files(email, db):
     cur = db.cursor()
 
     get_files = "SELECT files FROM local_users WHERE email='%s'" % (email)
@@ -79,8 +80,7 @@ def get_files(email):
         return []
 
 
-def add_file(email, filename):
-    db = connect()
+def add_file(email, filename, db):
     cur = db.cursor()
     file_list = "SELECT files FROM local_users WHERE email='%s'" % email
     cur.execute(file_list)
@@ -93,7 +93,7 @@ def add_file(email, filename):
     cur.execute(file_add)
     db.commit()
 
-
+# Note: This won't work right now, because of the changed signatures
 if __name__ == "__main__":
     loggedIn = False
     user = ""
