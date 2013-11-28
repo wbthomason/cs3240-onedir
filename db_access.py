@@ -16,6 +16,21 @@ def create_account(email, password, db):
     cur.execute(create_new_user)
     db.commit()
 
+def update_account(old_email, old_password, new_email, new_password, db):
+    cur = db.cursor()
+
+    update_user = "UPDATE local_users SET email='%s', password='%s' WHERE email='%s'" % (new_email, new_password, old_email)
+    cur.execute(update_user)
+    db.commit()
+    return True
+
+def delete_account(email, db):
+    cur = db.cursor()
+
+    delete_user = "DELETE FROM local_users WHERE email='%s'" % (email)
+    cur.execute(delete_user)
+    db.commit()
+    return True
 
 def login(email, password, db):
     cur = db.cursor()
@@ -93,6 +108,21 @@ def add_file(email, filename, db):
     cur.execute(file_add)
     db.commit()
 
+# Admin commands
+
+def list_users(db):
+    cur = db.cursor()
+
+    list_users = "SELECT email FROM local_users"
+    cur.execute(list_users)
+
+    users = []
+    res = cur.fetchone()
+    while res:
+        users.append(res[0])
+
+    return users
+    
 # Note: This won't work right now, because of the changed signatures
 if __name__ == "__main__":
     loggedIn = False

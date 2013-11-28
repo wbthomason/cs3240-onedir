@@ -41,6 +41,50 @@ class UserResource(Resource):
             passw = request.args['passw'][0]
             print "Creating a user! Got data: %s, %s" % (email, passw)
             db_access.create_account(email, passw, self.db)
+
+        # Assume both email and password are being changed. No change is 
+        # accomplished by passing the same arg for new.
+        elif urlparts[-1] == 'update':
+            old_email = request.args['old_email'][0]
+            old_password = request.args['old_password'][0]
+            new_email = request.args['new_email'][0]
+            new_password = request.args['new_password'][0]
+
+            if db_access.login(old_email, old_password, self.db):
+                db_access.update_account(old_email, old_password, new_email, new_password, self.db)
+
+        elif urlparts[-1] == 'delete':
+            email = request.args['email'][0]
+            password = request.args['password'][0]
+
+            if db_access.login(email, password, self.db):
+                delete_user(email, self.db)
+                return json.dumps({'auth_key': 0})
+
+        elif urlparts[-1] == 'admin':
+            password = request.args['password'][0]
+            if db_access.login('admin', password):
+                command = request.args['command'][0]
+
+                if command == "users":
+                    return json.dumps({'users':db_access.list_users(self.db)})
+
+                elif command == "files":
+                    email = request.args['email'][0]
+                    return json.dumps({'files':db_access.get_files(email, self.db)})
+
+                elif command == "change":
+                    old_email = request.args['old_email'][0]
+                    new_email = request.args['new_email'][0]
+                    new_password = request.args['new_password'][0]
+
+                    db_access.update_account(old_email, '', new_email, new_password, self.db)
+
+                elif command == "remove":
+                    email = request.args['email'][0]
+
+                    db_access.delete_account(email, self.db)
+
         return json.dumps({'auth_key': 1})
 
 
