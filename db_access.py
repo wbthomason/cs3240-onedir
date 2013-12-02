@@ -117,11 +117,14 @@ def list_users(db):
     cur.execute(list_users)
 
     users = []
-    res = cur.fetchone()
-    while res:
-        users.append(res[0])
+    res = cur.fetchall()
+
+    for row in res:
+        users.append(row[0])
 
     return users
+
+    
     
 # Note: This won't work right now, because of the changed signatures
 if __name__ == "__main__":

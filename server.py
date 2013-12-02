@@ -58,12 +58,12 @@ class UserResource(Resource):
             password = request.args['password'][0]
 
             if db_access.login(email, password, self.db):
-                delete_user(email, self.db)
+                db_access.delete_account(email, self.db)
                 return json.dumps({'auth_key': 0})
 
         elif urlparts[-1] == 'admin':
             password = request.args['password'][0]
-            if db_access.login('admin', password):
+            if db_access.login('admin', password, self.db):
                 command = request.args['command'][0]
 
                 if command == "users":

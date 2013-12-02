@@ -1,35 +1,29 @@
 import requests
 
-def update_user(old_email, new_email, new_password):
-    url = "http://localhost:3240/user/update"
-    args = {'command': 'change', 'old_email': old_email, 'new_email': new_email, 'new_password': new_password}
+def update_user(admin_password, old_email, new_email, new_password):
+    url = "http://localhost:3240/user/admin"
+    args = {'password': admin_password, 'command': 'change', 'old_email': old_email, 'new_email': new_email, 'new_password': new_password}
 
     r = requests.post(url, params=args)
-    self.auth_key = r.json()['auth_key']
-    if self.auth_key == 0:
-        return False
     return True
 
-def remove(email):
-    url = "http://localhost:3240/user/update"
-    args = {'command': 'remove', 'email': email}
+def remove(admin_password, email):
+    url = "http://localhost:3240/user/admin"
+    args = {'password': admin_password, 'command': 'remove', 'email': email}
 
     r = requests.post(url, params=args)
-    self.auth_key = r.json()['auth_key']
-    if self.auth_key == 0:
-        return False
     return True
 
-def list_users():
-    url = "http://localhost:3240/user/update"
-    args = {'command': 'users'}
+def list_users(admin_password):
+    url = "http://localhost:3240/user/admin"
+    args = {'password': admin_password, 'command': 'users'}
 
     r = requests.post(url, params=args)
     return r.json()['users']
 
-def list_files(email):
-	url = "http://localhost:3240/user/update"
-    args = {'command': 'files', 'email': email}
+def list_files(admin_password, email):
+    url = "http://localhost:3240/user/admin"
+    args = {'password': admin_password, 'command': 'files', 'email': email}
 
     r = requests.post(url, params=args)
     return r.json()['files']

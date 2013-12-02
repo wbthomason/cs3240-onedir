@@ -10,13 +10,10 @@ class User():
 
     def create(self):
         url = "http://localhost:3240/user/create"
-        args = {'email': self.email, 'password': self.password}
+        args = {'email': self.email, 'passw': self.password}
 
         r = requests.post(url, params=args)
-        res = r.json()['result']
-
-        if res == 0:
-            return False
+        
         return True
 
     def login(self):
@@ -29,7 +26,7 @@ class User():
             return False
         return True
 
-    def update(new_email, new_password):
+    def update(self, new_email, new_password):
         url = "http://localhost:3240/user/update"
         args = {'old_email': self.email, 'old_password': self.password, 'new_email': new_email, 'new_password': new_password}
 
@@ -39,14 +36,11 @@ class User():
             return False
         return True
 
-    def delete():
+    def delete(self):
         url = "http://localhost:3240/user/delete"
         args = {'email': self.email, 'password': self.password}
 
         r = requests.post(url, params=args)
-        self.auth_key = r.json()['auth_key']
-        if self.auth_key == 0:
-            return True
         return False
 
     def logout(self):

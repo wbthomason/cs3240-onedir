@@ -1,103 +1,130 @@
-import user
+from user import User
 import admin
+import db_access
 
 if __name__ == "__main__":
-    email = raw_input("Email: ")
-    password = raw_input("Password: ")
-    user = User(email, password, '')
 
-    if(user.login()):
-    	while True:
-    		print "Available Commands:"
-    		print "login"
-    		print "update"
-    		print "delete"
-    		print "create"
+    user = None
 
-    		print ""
-    		print "Admin Functions:"
-    		print "users"
-    		print "change"
-    		print "files"
-    		print "remove"
+    print "##########################"
+    print ""
 
-    		command = raw_input("Enter a command: ")
+    print "Available Commands:"
+    print "login"
+    print "logout"
+    print "print"
+    print "update"
+    print "delete"
+    print "create"
 
-    		if command == "login":
-    			email = raw_input("Email: ")
-    			password = raw_input("Password: ")
-    			user = User(email, password, '')
-    			if user.login():
-    				print "Login successful!"
-    			else:
-    				user = None
-    				print "Login failed."
+    print ""
+    print "Admin Functions:"
+    print "users"
+    print "change"
+    print "files"
+    print "remove"
 
-    		elif command == "update":
-    			if not user:
-    				print "Please login first"
-    				continue
+    print ""
+    print "##########################"
 
-    			new_email = raw_input("New Email: ")
-    			new_password = raw_input("New Password: ")
 
-    			user.update(new_email, new_password)
+    while True:
+        print ""
+        command = raw_input("Enter a command: ")
 
-    		elif command == "delete":
-    			if not user:
-    				print "Please login first"
-    				continue
+        if command == "print":
+            if not user:
+                print "no current user"
+                continue
+            print "email: " + user.email
+            print "password: " + user.password
 
-    			confirm = raw_input("Are you sure? Y/n: ")
+        if command == "login":
+            email = raw_input("Email: ")
+            password = raw_input("Password: ")
+            user = User(email, password, '')
+            if user.login():
+                print "Login successful!"
+            else:
+                user = None
+                print "Login failed."
 
-    			if confirm == "Y" or confirm == "y" or confirm == "yes" or confirm == "Yes":
-    				user.delete()
+        if command == "logout":
+            user = None
 
-    		elif command == "create":
-    			email = raw_input("Email: ")
-    			password = raw_input("Password: ")
-    			password_confirm = raw_input("Confirm Password: ")
-    			while password != password_confirm:
-    				print "Passwords do no match"
-    				password = raw_input("Password: ")
-    				password_confirm = raw_input("Confirm Password: ")
-    			
-    			user = User(email, password, '')
-    			user.create()
+        elif command == "update":
+            if not user:
+                print "Please login first"
+                continue
 
-    		elif command == "users":
-    			if not user.email == 'admin':
-    				print "Must have admin privileges"
-    				continue
+            new_email = raw_input("New Email: ")
+            new_password = raw_input("New Password: ")
 
-    			print admin.list_users()
+            user.update(new_email, new_password)
+            user.email = new_email
+            user.password = new_password
 
-    		elif command == "change":
-    			if not user.email == 'admin':
-    				print "Must have admin privileges"
-    				continue
+        elif command == "delete":
+            if not user:
+                print "Please login first"
+                continue
 
-    			old_email = raw_input("Email: ")
-    			new_email = raw_input("New Email: ")
-    			new_password = raw_input("New Password: ")
+            confirm = raw_input("Are you sure? Y/n: ")
 
-    			admin.update_user(old_email, new_email, new_password)
+            if confirm == "Y" or confirm == "y" or confirm == "yes" or confirm == "Yes":
+                print "deleting %s with password %s" % (user.email, user.password)
+                
+                user.delete()
+                user = None
 
-    		elif command == "files":
-    			if not user.email == 'admin':
-    				print "Must have admin privileges"
-    				continue
+        elif command == "create":
+            email = raw_input("Email: ")
+            password = raw_input("Password: ")
+            password_confirm = raw_input("Confirm Password: ")
+            while password != password_confirm:
+                print "Passwords do no match"
+                password = raw_input("Password: ")
+                password_confirm = raw_input("Confirm Password: ")
+			
+            user = User(email, password, '')
+            user.create()
 
-    			email = raw_input("Email: ")
+        elif command == "users":
+            if not user.email == 'admin':
+                print "Must have admin privileges"
+                continue
 
-    			print admin.list_files(email)
+            print admin.list_users(user.password)
 
-    		elif command == "remove":
-    			if not user.email == 'admin':
-    				print "Must have admin privileges"
-    				continue
+        elif command == "change":
+            if not user.email == 'admin':
+                print "Must have admin privileges"
+                continue
 
-    			email = raw_input("Email: ")
+            old_email = raw_input("Email: ")
+            new_email = raw_input("New Email: ")
+            new_password = raw_input("New Password: ")
 
-    			admin.remove(email)
+            admin.update_user(user.password, old_email, new_email, new_password)
+
+        elif command == "files":
+            if not user.email == 'admin':
+                print "Must have admin privileges"
+                continue
+
+            email = raw_input("Email: ")
+
+            print admin.list_files(user.password, email)
+
+        elif command == "remove":
+            if not user.email == 'admin':
+                print "Must have admin privileges"
+                continue
+
+            email = raw_input("Email: ")
+
+            admin.remove(user.password, email)
+
+        elif command == "quit":
+            break
 
