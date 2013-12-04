@@ -75,7 +75,7 @@ def set_dirs(email, dirs, db):
 
 def get_id(email, db):
     cur = db.cursor()
-    cur.execute("SELECT id FROM local_users WHERE email='%s'" % email)
+    cur.execute("SELECT id FROM local_users WHERE email='%s'" % (email))
     return cur.fetchone()[0]
 
 
@@ -89,14 +89,16 @@ def add_dir(email, dir, db):
 def get_files(email, db):
     cur = db.cursor()
 
-    get_files = "SELECT files FROM local_users WHERE email='%s'" % (email)
+    get_files = "SELECT file, size FROM user_files WHERE user_id='%s'" % ( get_id(email, db) )
     cur.execute(get_files)
-    res = cur.fetchone()
+    res = cur.fetchall()
 
-    try:
-        return res[0].split(',')
-    except:
-        return []
+    files = {}
+    for row in res:
+        files[row[0]] = row[1]
+
+    return files
+
 
 
 def add_file(email, filename, db):

@@ -2,6 +2,7 @@ import bcrypt
 
 from user import User
 import admin
+import db_access
 
 
 if __name__ == "__main__":
@@ -120,7 +121,11 @@ if __name__ == "__main__":
 
             email = raw_input("Email: ")
 
-            print admin.list_files(user.password, email)
+            db = db_access.connect()
+            files = db_access.get_files(email, db)
+            
+            for file_name in files.keys():
+                print file_name + ": " + str(files[file_name]) + " Bytes"
 
         elif command == "remove":
             if not user.email == 'admin':

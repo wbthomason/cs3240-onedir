@@ -7,12 +7,12 @@ from Crypto.Hash import SHA512
 import cryption
 
 
-def upload_file(file_name, user):
+def upload_file(file_name, file_size, user):
     h = SHA512.new()
     h.update(bytes(user.password))
     key = h.digest()[:32]
     url = 'http://localhost:3240/files'
-    params = {'filename': file_name[len(user.dir):], 'username': user.email}
+    params = {'filename': file_name[len(user.dir):], 'username': user.email, 'filesize': file_size}
     #with open(file_name, 'rb') as put_file:
     put_file = cryption.encrypt(key, file_name)
     put_file.seek(0)

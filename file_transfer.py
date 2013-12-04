@@ -47,8 +47,7 @@ def download_files(files, user):
 def file_upload(file_path, user):
     try:
         file_size = os.stat(file_path).st_size
-        print file_size
-        upload_file(file_path, user)
+        upload_file(file_path, file_size, user)
         print file_path + " pushed to server"
 
     except HTTPError as e:

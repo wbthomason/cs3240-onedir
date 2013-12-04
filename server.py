@@ -138,9 +138,11 @@ class FileResource(Resource):
 
         cur = self.db.cursor()
         user_id = int(db_access.get_id(request.args['username'][0], self.db))
-        updated = "INSERT INTO user_files (user_id, file, last_update) VALUES ('%(uid)d', '%(file)s', '%(time)f') " \
-                  "ON DUPLICATE KEY UPDATE last_update='%(time)f'" \
-                  % {'uid': user_id, 'file': file_name, 'time': time.time()}
+        file_size = int(request.args['filesize'][0])
+
+        updated = "INSERT INTO user_files (user_id, file, size, last_update) VALUES ('%(uid)d', '%(file)s', '%(size)d', '%(time)f') " \
+                  "ON DUPLICATE KEY UPDATE last_update='%(time)f', size='%(size)d'" \
+                  % {'uid': user_id, 'file': file_name, 'size': file_size, 'time': time.time()}
         # "UPDATE user_files SET last_update='%f' WHERE file='%s' AND user_id='%d'" % (time.time(), file_name, user_id)
         cur.execute(updated)
         self.db.commit()
