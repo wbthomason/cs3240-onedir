@@ -9,7 +9,7 @@ class User():
         self.auth_key = 0
 
     def create(self, passhash):
-        url = "https://localhost:3240/user/create"
+        url = "http://localhost:3240/user/create"
         args = {'email': self.email, 'passw': passhash}
 
         requests.post(url, params=args, verify=False)
@@ -17,7 +17,7 @@ class User():
         return True
 
     def login(self):
-        url = "https://localhost:3240/user/auth"
+        url = "http://localhost:3240/user/auth"
         args = {'email': self.email, 'passw': self.password}
 
         r = requests.post(url, params=args, verify=False)
@@ -27,7 +27,7 @@ class User():
         return True
 
     def update(self, new_email, new_password):
-        url = "https://localhost:3240/user/update"
+        url = "http://localhost:3240/user/update"
         args = {'old_email': self.email, 'old_password': self.password, 'new_email': new_email,
                 'new_password': new_password}
         r = requests.post(url, params=args, verify=False)
@@ -37,7 +37,7 @@ class User():
         return True
 
     def delete(self):
-        url = "https://localhost:3240/user/delete"
+        url = "http://localhost:3240/user/delete"
         args = {'email': self.email, 'password': self.password}
 
         requests.post(url, params=args, verify=False)

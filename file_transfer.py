@@ -16,7 +16,7 @@ def check_updates(time, user):
 
 
 def get_files(last_check, user):
-    url = "https://localhost:3240/check"
+    url = "http://localhost:3240/check"
     print "CHECKING AT TIME %f" % last_check
     args = {'email': user.email, 'last_check': float(last_check)}
     r = requests.get(url, params=args, verify=False)
@@ -31,7 +31,7 @@ def download_files(files, user):
     key = h.digest()[:32]
     for file_name in files:
         local_file = user.dir + file_name
-        fileurl = "https://localhost:3240/files"
+        fileurl = "http://localhost:3240/files"
         print "downloading file " + file_name
         filereq = requests.get(fileurl, params={'filename': file_name, 'username': user.email}, stream=True,
                                verify=False)
