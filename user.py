@@ -8,19 +8,19 @@ class User():
         self.dir = dir
         self.auth_key = 0
 
-    def create(self):
+    def create(self, passhash):
         url = "http://localhost:3240/user/create"
-        args = {'email': self.email, 'passw': self.password}
+        args = {'email': self.email, 'passw': passhash}
 
-        r = requests.post(url, params=args)
-        
+        requests.post(url, params=args, verify=False)
+
         return True
 
     def login(self):
         url = "http://localhost:3240/user/auth"
         args = {'email': self.email, 'passw': self.password}
 
-        r = requests.post(url, params=args)
+        r = requests.post(url, params=args, verify=False)
         self.auth_key = r.json()['auth_key']
         if self.auth_key == 0:
             return False
@@ -28,9 +28,9 @@ class User():
 
     def update(self, new_email, new_password):
         url = "http://localhost:3240/user/update"
-        args = {'old_email': self.email, 'old_password': self.password, 'new_email': new_email, 'new_password': new_password}
-
-        r = requests.post(url, params=args)
+        args = {'old_email': self.email, 'old_password': self.password, 'new_email': new_email,
+                'new_password': new_password}
+        r = requests.post(url, params=args, verify=False)
         self.auth_key = r.json()['auth_key']
         if self.auth_key == 0:
             return False
@@ -40,7 +40,7 @@ class User():
         url = "http://localhost:3240/user/delete"
         args = {'email': self.email, 'password': self.password}
 
-        r = requests.post(url, params=args)
+        requests.post(url, params=args, verify=False)
         return False
 
     def logout(self):

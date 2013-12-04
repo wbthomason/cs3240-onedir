@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys
-
+import bcrypt
 import MySQLdb as mdb
 
 
@@ -16,13 +16,16 @@ def create_account(email, password, db):
     cur.execute(create_new_user)
     db.commit()
 
+
 def update_account(old_email, old_password, new_email, new_password, db):
     cur = db.cursor()
 
-    update_user = "UPDATE local_users SET email='%s', password='%s' WHERE email='%s'" % (new_email, new_password, old_email)
+    update_user = "UPDATE local_users SET email='%s', password='%s' WHERE email='%s'" % (
+    new_email, new_password, old_email)
     cur.execute(update_user)
     db.commit()
     return True
+
 
 def delete_account(email, db):
     cur = db.cursor()
@@ -32,6 +35,7 @@ def delete_account(email, db):
     db.commit()
     return True
 
+
 def login(email, password, db):
     cur = db.cursor()
 
@@ -39,7 +43,7 @@ def login(email, password, db):
     cur.execute(get_login)
     res = cur.fetchone()
 
-    return password == res[0]
+    return bcrypt.hashpw(password, res[0]) == res[0]
 
 
 def get_dirs(email, db):
@@ -124,8 +128,7 @@ def list_users(db):
 
     return users
 
-    
-    
+
 # Note: This won't work right now, because of the changed signatures
 if __name__ == "__main__":
     loggedIn = False

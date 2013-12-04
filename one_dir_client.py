@@ -1,6 +1,8 @@
+import bcrypt
+
 from user import User
 import admin
-import db_access
+
 
 if __name__ == "__main__":
 
@@ -27,6 +29,10 @@ if __name__ == "__main__":
     print ""
     print "##########################"
 
+    # A quick note on security in this code:
+    # The security here is designed as a proof of possibility, 
+    # and SHOULD NOT EVER be used in a scenario which needs actual 
+    # security. The same holds for the entire project.
 
     while True:
         print ""
@@ -60,7 +66,7 @@ if __name__ == "__main__":
             new_email = raw_input("New Email: ")
             new_password = raw_input("New Password: ")
 
-            user.update(new_email, new_password)
+            user.update(new_email, bcrypt.hashpw(new_password, bcrypt.gensalt(10)))
             user.email = new_email
             user.password = new_password
 
@@ -85,9 +91,9 @@ if __name__ == "__main__":
                 print "Passwords do no match"
                 password = raw_input("Password: ")
                 password_confirm = raw_input("Confirm Password: ")
-			
+
             user = User(email, password, '')
-            user.create()
+            user.create(bcrypt.hashpw(password, bcrypt.gensalt(10)))
 
         elif command == "users":
             if not user.email == 'admin':
@@ -105,7 +111,7 @@ if __name__ == "__main__":
             new_email = raw_input("New Email: ")
             new_password = raw_input("New Password: ")
 
-            admin.update_user(user.password, old_email, new_email, new_password)
+            admin.update_user(user.password, old_email, new_email, bcrypt.hashpw(new_password, bcrypt.gensalt(10)))
 
         elif command == "files":
             if not user.email == 'admin':

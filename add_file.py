@@ -2,11 +2,15 @@ import sys
 
 import requests
 import MySQLdb as mdb
+from Crypto.Hash import SHA512
 
 
 def upload_file(file_name, user):
+    h = SHA512.new()
+    h.update(bytes(user.password))
+    key = h.digest()[:32]
     url = 'http://localhost:3240/files'
-    files = {'file': open(file_name)}
+    files = {'file': open(file_name, 'rb')}
     params = {'filename': file_name[len(user.dir):], 'username': user.email}
     req = requests.put(url, files=files, params=params)
     req.raise_for_status()

@@ -20,9 +20,9 @@ def download_check(auth_data):
         raise LoginError("Invalid Credentials")
     files = get_files(auth_data.username)
     for file in files:
-        fileurl = "http://localhost:3240/%s" % file
+        fileurl = "https://localhost:3240/%s" % file
         print fileurl
-        filereq = requests.get(fileurl, stream=True)
+        filereq = requests.get(fileurl, stream=True, verify=False)
         with open(file, 'wb') as dl_file:
             for chunk in filereq.iter_content(1024):
                 dl_file.write(chunk)

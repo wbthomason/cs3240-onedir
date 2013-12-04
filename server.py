@@ -1,9 +1,10 @@
 import os
 import json
 import time
+from subprocess import call
 
 from twisted.web.server import Site, NOT_DONE_YET
-from twisted.internet import reactor
+from twisted.internet import ssl, reactor
 from twisted.web.resource import Resource
 
 import db_access
@@ -52,6 +53,7 @@ class UserResource(Resource):
 
             if db_access.login(old_email, old_password, self.db):
                 db_access.update_account(old_email, old_password, new_email, new_password, self.db)
+                call(["mv", "./files/%s" % old_email, "./files/%s" % new_email])
 
         elif urlparts[-1] == 'delete':
             email = request.args['email'][0]
@@ -59,6 +61,7 @@ class UserResource(Resource):
 
             if db_access.login(email, password, self.db):
                 db_access.delete_account(email, self.db)
+                call(["rm -rf", "./files/%s" % email])
                 return json.dumps({'auth_key': 0})
 
         elif urlparts[-1] == 'admin':
@@ -105,6 +108,7 @@ class CheckResource(Resource):
         print data
         return json.dumps(data)
 
+
 # May need to fix things to stream properly.
 class FileResource(Resource):
     def __init__(self, db):
@@ -148,6 +152,9 @@ class FileResource(Resource):
 if __name__ == "__main__":
     resource = FileServerResource()
     factory = Site(resource)
+    with open("onedirkey.crt") as keycert:
+        cert = ssl.PrivateCertificate.loadPEM(keycert.read())
+
     reactor.listenTCP(3240, factory)
     print "Listening on 3240."
     reactor.run()
