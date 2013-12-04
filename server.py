@@ -155,6 +155,6 @@ if __name__ == "__main__":
     with open("onedirkey.crt") as keycert:
         cert = ssl.PrivateCertificate.loadPEM(keycert.read())
 
-    reactor.listenSSL(3240, factory, cert.options())
+    reactor.listenTCP(3240, factory)
     print "Listening on 3240."
     reactor.run()

@@ -11,7 +11,7 @@ def upload_file(file_name, user):
     h = SHA512.new()
     h.update(bytes(user.password))
     key = h.digest()[:32]
-    url = 'https://localhost:3240/files'
+    url = 'http://localhost:3240/files'
     params = {'filename': file_name[len(user.dir):], 'username': user.email}
     #with open(file_name, 'rb') as put_file:
     put_file = cryption.encrypt(key, file_name)
