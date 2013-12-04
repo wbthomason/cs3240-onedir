@@ -63,7 +63,7 @@ class Daemon:
         atexit.register(self.delpid)
         pid = str(os.getpid())
         print "Writing pid %s" % pid
-        file(self.pidfile, 'w').write("%s\n" % pid)
+        open(self.pidfile, 'w+').write("%s\n" % pid)
         print "Wrote pid %s to %s" % (pid, self.pidfile)
 
     def delpid(self):
@@ -75,7 +75,7 @@ class Daemon:
         """
         # Check for a pidfile to see if the daemon already runs
         try:
-            pf = file(self.pidfile, 'r')
+            pf = open(self.pidfile, 'r')
             pid = int(pf.read().strip())
             pf.close()
         except IOError:
