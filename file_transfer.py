@@ -29,7 +29,8 @@ def download_files(files, user):
     h.update(bytes(user.password))
     key = h.digest()[:32]
     for file_name in files:
-        full_dir = '/'.join(file_name.split('/')[:-1]) + '/'
+        full_dir = user.dir + '/'.join(file_name.split('/')[:-1]) + '/'
+        print full_dir
         if not os.path.exists(full_dir):
             os.makedirs(full_dir)
         local_file = user.dir + file_name
