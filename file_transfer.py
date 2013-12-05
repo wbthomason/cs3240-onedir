@@ -29,6 +29,9 @@ def download_files(files, user):
     h.update(bytes(user.password))
     key = h.digest()[:32]
     for file_name in files:
+        full_dir = '/'.join(file_name.split('/')[:-1]) + '/'
+        if not os.path.exists(full_dir):
+            os.makedirs(full_dir)
         local_file = user.dir + file_name
         fileurl = "http://%s:3240/files" % user.addr
         print "downloading file " + file_name
