@@ -127,10 +127,7 @@ class FileResource(Resource):
         version = int(db_access.get_version(username, file_name_raw, self.db))
 
         file_parts = file_name_raw.split(".")
-        if len(file_parts) == 1:
-            file_parts.append('')
-            # Add the version number
-        file_parts[-1] = str(version)
+        file_parts.append( str(version) )
 
         # Python is a beautiful, terrifying language
         file_name = "."
@@ -154,10 +151,7 @@ class FileResource(Resource):
         version = int(db_access.get_version(username, file_name_raw, self.db))
 
         file_parts = file_name_raw.split(".")
-        if len(file_parts) == 1:
-            file_parts.append('')
-            # Add the version number
-        file_parts[-1] = str(version + 1)
+        file_parts.append( str(version + 1) )
 
         # Python is a beautful, terrifying language
         file_name = "."
