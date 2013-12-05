@@ -50,7 +50,8 @@ if __name__ == "__main__":
         if command == "login":
             email = raw_input("Email: ")
             password = getpass.getpass("Password: ")
-            user = User(email, password, '')
+            host = raw_input("Host: ")
+            user = User(email, password, '', host)
             if user.login():
                 print "Login successful!"
             else:
@@ -66,7 +67,7 @@ if __name__ == "__main__":
                 continue
 
             new_email = raw_input("New Email: ")
-            new_password = raw_input("New Password: ")
+            new_password = getpass.getpass("New Password: ")
 
             user.update(new_email, bcrypt.hashpw(new_password, bcrypt.gensalt(10)))
             user.email = new_email
@@ -87,8 +88,8 @@ if __name__ == "__main__":
 
         elif command == "create":
             email = raw_input("Email: ")
-            password = raw_input("Password: ")
-            password_confirm = raw_input("Confirm Password: ")
+            password = getpass.getpass("Password: ")
+            password_confirm = getpass.getpass("Confirm Password: ")
             while password != password_confirm:
                 print "Passwords do no match"
                 password = raw_input("Password: ")
@@ -111,7 +112,7 @@ if __name__ == "__main__":
 
             old_email = raw_input("Email: ")
             new_email = raw_input("New Email: ")
-            new_password = raw_input("New Password: ")
+            new_password = getpass.getpass("New Password: ")
 
             admin.update_user(user.password, old_email, new_email, bcrypt.hashpw(new_password, bcrypt.gensalt(10)))
 
