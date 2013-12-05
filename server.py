@@ -35,9 +35,9 @@ class UserResource(Resource):
             passw = request.args['passw'][0]
             print "Doing auth stuff! Got data: %s, %s" % (email, passw)
             if not db_access.login(email, passw, self.db):
-                logstr = "%f: Failed login for %s from %s" % (time.time(), email, str(request.getClientIP()))
+                logstr = "%f: Failed login for %s from %s\n" % (time.time(), email, str(request.getClientIP()))
                 print logstr
-                with open('./log.txt', 'w+') as log:
+                with open('./log.txt', 'a') as log:
                     log.write(logstr)
                 return json.dumps({'auth_key': 0})
 
@@ -47,9 +47,9 @@ class UserResource(Resource):
             passw = request.args['passw'][0]
             print "Creating a user! Got data: %s, %s" % (email, passw)
             db_access.create_account(email, passw, self.db)
-            logstr = "%f: Created %s as requested by %s" % (time.time(), email, str(request.getClientIP()))
+            logstr = "%f: Created %s as requested by %s\n" % (time.time(), email, str(request.getClientIP()))
             print logstr
-            with open('./log.txt', 'w+') as log:
+            with open('./log.txt', 'a') as log:
                 log.write(logstr)
         # Assume both email and password are being changed. No change is 
         # accomplished by passing the same arg for new.
@@ -62,10 +62,10 @@ class UserResource(Resource):
             if db_access.login(old_email, old_password, self.db):
                 db_access.update_account(old_email, old_password, new_email, new_password, self.db)
                 call("mv " + "./files/%s" % old_email + " ./files/%s" % new_email, shell=True)
-                logstr = "%f: Updated from %s and %s to %s and %s from IP %s" % (
+                logstr = "%f: Updated from %s and %s to %s and %s from IP %s\n" % (
                     time.time(), old_email, old_password, new_email, new_password, str(request.getClientIP()))
                 print logstr
-                with open('./log.txt', 'w+') as log:
+                with open('./log.txt', 'a') as log:
                     log.write(logstr)
 
         elif urlparts[-1] == 'delete':
@@ -75,9 +75,9 @@ class UserResource(Resource):
             if db_access.login(email, password, self.db):
                 db_access.delete_account(email, self.db)
                 call("rm -rf " + "./files/%s" % email, shell=True)
-                logstr = "%f: Deleted %s from %s" % (time.time(), email, str(request.getClientIP()))
+                logstr = "%f: Deleted %s from %s\n" % (time.time(), email, str(request.getClientIP()))
                 print logstr
-                with open('./log.txt', 'w+') as log:
+                with open('./log.txt', 'a') as log:
                     log.write(logstr)
                 return json.dumps({'auth_key': 0})
 
@@ -87,17 +87,17 @@ class UserResource(Resource):
                 command = request.args['command'][0]
 
                 if command == "users":
-                    logstr = "%f: Admin listed users from %s" % (time.time(), str(request.getClientIP()))
+                    logstr = "%f: Admin listed users from %s\n" % (time.time(), str(request.getClientIP()))
                     print logstr
-                    with open('./log.txt', 'w+') as log:
+                    with open('./log.txt', 'a') as log:
                         log.write(logstr)
                     return json.dumps({'users': db_access.list_users(self.db)})
 
                 elif command == "files":
                     email = request.args['email'][0]
-                    logstr = "%f: Admin listed users from %s" % (time.time(), str(request.getClientIP()))
+                    logstr = "%f: Admin listed users from %s\n" % (time.time(), str(request.getClientIP()))
                     print logstr
-                    with open('./log.txt', 'w+') as log:
+                    with open('./log.txt', 'a') as log:
                         log.write(logstr)
                     return json.dumps({'files': db_access.get_files(email, self.db)})
 
@@ -107,17 +107,17 @@ class UserResource(Resource):
                     new_password = request.args['new_password'][0]
 
                     db_access.update_account(old_email, '', new_email, new_password, self.db)
-                    logstr = "%f: Admin updated from %s to %s and %s from IP %s" % (
+                    logstr = "%f: Admin updated from %s to %s and %s from IP %s\n" % (
                         time.time(), old_email, new_email, new_password, str(request.getClientIP()))
                     print logstr
-                    with open('./log.txt', 'w+') as log:
+                    with open('./log.txt', 'a') as log:
                         log.write(logstr)
                 elif command == "remove":
                     email = request.args['email'][0]
                     db_access.delete_account(email, self.db)
-                    logstr = "%f: Admin deleted %s from %s" % (time.time(), email, str(request.getClientIP()))
+                    logstr = "%f: Admin deleted %s from %s\n" % (time.time(), email, str(request.getClientIP()))
                     print logstr
-                    with open('./log.txt', 'w+') as log:
+                    with open('./log.txt', 'a') as log:
                         log.write(logstr)
 
         return json.dumps({'auth_key': 1})
@@ -138,9 +138,9 @@ class CheckResource(Resource):
         res = cur.fetchall()
         data = [item[0] for item in res]
         print data
-        logstr = "%f: Check request for %s from %s" % (time.time(), user, str(request.getClientIP()))
+        logstr = "%f: Check request for %s from %s\n" % (time.time(), user, str(request.getClientIP()))
         print logstr
-        with open('./log.txt', 'w+') as log:
+        with open('./log.txt', 'a') as log:
             log.write(logstr)
         return json.dumps(data)
 
@@ -170,10 +170,10 @@ class FileResource(Resource):
         request.setHeader('Content-Length', os.stat(directory + file_name).st_size)
         with open("./files/%s/%s" % (username, file_name), 'rb') as readFile:
             request.write(readFile.read())
-        logstr = "%f: Request for %s for %s from %s" % (
-        time.time(), file_name_raw, username, str(request.getClientIP()))
+        logstr = "%f: Request for %s for %s from %s\n" % (
+            time.time(), file_name_raw, username, str(request.getClientIP()))
         print logstr
-        with open('./log.txt', 'w+') as log:
+        with open('./log.txt', 'a') as log:
             log.write(logstr)
         request.finish()
         return NOT_DONE_YET
@@ -216,9 +216,9 @@ class FileResource(Resource):
         cur.execute(updated)
         self.db.commit()
         request.write('received')
-        logstr = "%f: %s pushed %s from %s" % (time.time(), username, file_name_raw, str(request.getClientIP()))
+        logstr = "%f: %s pushed %s from %s\n" % (time.time(), username, file_name_raw, str(request.getClientIP()))
         print logstr
-        with open('./log.txt', 'w+') as log:
+        with open('./log.txt', 'a') as log:
             log.write(logstr)
         request.finish()
         return NOT_DONE_YET
@@ -235,9 +235,9 @@ class FileResource(Resource):
         directory = "./files/%s/" % request.args['username'][0]
         print directory + file_name_raw + '*'
         call("rm -rf " + directory + file_name_raw + '*', shell=True)
-        logstr = "%f: %s deleted %s from %s" % (time.time(), username, file_name_raw, str(request.getClientIP()))
+        logstr = "%f: %s deleted %s from %s\n" % (time.time(), username, file_name_raw, str(request.getClientIP()))
         print logstr
-        with open('./log.txt', 'w+') as log:
+        with open('./log.txt', 'a') as log:
             log.write(logstr)
         request.finish()
         return NOT_DONE_YET
