@@ -119,8 +119,27 @@ class FileResource(Resource):
     def render_GET(self, request):
         print "Request for %s" % request.path
         directory = "./files/%s/" % request.args['username'][0]
-        request.setHeader('Content-Length', os.stat(directory + request.args['filename'][0]).st_size)
-        with open("./files/%s/%s" % (request.args['username'][0], request.args['filename'][0]), 'rb') as readFile:
+
+        # Behind the scenes work to get versioning data
+        username = request.args['username'][0]
+        file_name_raw = request.args['filename'][0]
+        version = int(db_access.get_version(username, file_name_raw, self.db))
+
+        file_parts = file_name_raw.split(".")
+
+        # Make room for the version number
+        file_parts.append( file_parts[-1] )
+
+        # Add the version number
+        file_parts[-2] = str(version)
+
+        # Python is a beautful, terrifying language
+        file_name = "."
+        file_name = file_name.join(file_parts)
+
+
+        request.setHeader('Content-Length', os.stat(directory + file_name).st_size)
+        with open("./files/%s/%s" % (username, file_name, 'rb') as readFile:
             request.write(readFile.read())
 
         request.finish()
@@ -128,7 +147,28 @@ class FileResource(Resource):
 
     # Again, I *think* this streams the file (though, now that I think about it, content.read() definitely doesn't...)
     def render_PUT(self, request):
-        file_name = request.args['filename'][0]
+        file_name_raw = request.args['filename'][0]
+        username = request.args['username'][0]
+
+        # Get the version number, increment it by 1, and secretly make that the file name
+        version = int(db_access.get_version(username, file_name_raw, self.db))
+
+        file_parts = file_name_raw.split(".")
+
+        # Make room for the version number
+        file_parts.append( file_parts[-1] )
+
+        # Add the version number
+        file_parts[-2] = str(version+1)
+
+        # Python is a beautful, terrifying language
+        file_name = "."
+        file_name = file_name.join(file_parts)
+
+        # Update the DB with current version
+        db_access.inc_version(email, file_name_raw, version, self.db)
+
+
         directory = "./files/%s/" % request.args['username'][0]
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -137,7 +177,7 @@ class FileResource(Resource):
             writeFile.write(request.content.read())
 
         cur = self.db.cursor()
-        user_id = int(db_access.get_id(request.args['username'][0], self.db))
+        user_id = int(db_access.get_id(username, self.db))
         file_size = int(request.args['filesize'][0])
 
         updated = "INSERT INTO user_files (user_id, file, size, last_update) VALUES ('%(uid)d', '%(file)s', '%(size)d', '%(time)f') " \

@@ -99,6 +99,21 @@ def get_files(email, db):
 
     return files
 
+def get_version(email, file_name, db):
+    cur = db.cursor()
+    version = "SELECT version FROM user_files WHERE user_id='%s' AND file='%s'" % ( get_id(email, db), file_name )
+
+    cur.execute(version)
+    res = cur.fetchone()
+
+    return res[0]
+
+def inc_version(email, file_name, version, db):
+    cur = db.cursor()
+    inc = "UPDATE user_files SET version='%d' WHERE user_id='%s' AND file='%s'" % (version + 1, get_id(email, db), file_name)
+
+    cur.execute(inc)
+    db.commit()
 
 
 def add_file(email, filename, db):
