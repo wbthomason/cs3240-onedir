@@ -3,6 +3,7 @@
 import sys
 import time
 import threading
+from getpass import getpass
 
 from watchdog.observers import Observer
 
@@ -14,7 +15,7 @@ from user import User
 
 class Sauron(Daemon):
     def __init__(self, user_data):
-        Daemon.__init__(self, './tmp/onedir.pid', sys.stdin, sys.stdout, sys.stderr)
+        Daemon.__init__(self, '/tmp/onedir.pid', sys.stdin, sys.stdout, sys.stderr)
         self.user = user_data
         self.last_check = 0.0
 
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         if 'start' == sys.argv[1]:
             email = raw_input("Email: ")
-            password = raw_input("Password: ")
+            password = getpass("Password: ")
             user = User(email, password, sys.argv[2])
             daemon = Sauron(user)
             daemon.start()

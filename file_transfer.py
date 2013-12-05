@@ -46,28 +46,27 @@ def download_files(files, user):
 def file_upload(file_path, user):
     try:
         file_size = os.stat(file_path).st_size
-        upload_file(file_path, file_size, user, False)
+        upload_file(file_path, file_size, user)
         print file_path + " pushed to server"
 
     except HTTPError as e:
         print e.reason()
 
 
-def upload_file(file_name, file_size, user, isdir):
+def upload_file(file_name, file_size, user):
     h = SHA512.new()
     h.update(bytes(user.password))
     key = h.digest()[:32]
     url = 'http://localhost:3240/files'
-    params = {'filename': file_name[len(user.dir):], 'username': user.email, 'filesize': file_size, 'dir': isdir}
-    if not isdir:
-        put_file = cryption.encrypt(key, file_name)
-        put_file.seek(0)
-    else:
-        put_file = None
+    params = {'filename': file_name[len(user.dir):], 'username': user.email, 'filesize': file_size}
+    put_file = cryption.encrypt(key, file_name)
+    put_file.seek(0)
     req = requests.put(url, data=put_file, params=params, verify=False)
     req.raise_for_status()
 
 
-def file_delete(file_path, user):
-    # Dummy Code
-    print file_path + " removed from server"
+def file_delete(file_name, user):
+    url = 'http://localhost:3240/files'
+    params = {'filename': file_name[len(user.dir):], 'username': user.email}
+    req = requests.delete(url, params=params, verify=False)
+    req.raise_for_status()

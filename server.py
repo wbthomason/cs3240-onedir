@@ -145,7 +145,6 @@ class FileResource(Resource):
     def render_PUT(self, request):
         file_name_raw = request.args['filename'][0]
         username = request.args['username'][0]
-        dir = bool(request.args['dir'][0])
 
         # Get the version number, increment it by 1, and secretly make that the file name
         version = int(db_access.get_version(username, file_name_raw, self.db))
@@ -159,10 +158,12 @@ class FileResource(Resource):
 
         # Update the DB with current version
         db_access.inc_version(username, file_name_raw, version, self.db)
-
+        # Because nested one-liners are great coding practice
+        morepath = '/'.join(file_name.split('/')[:-1])
         directory = "./files/%s/" % request.args['username'][0]
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        full_dir = directory + morepath + '/'
+        if not os.path.exists(full_dir):
+            os.makedirs(full_dir)
 
         with open(directory + file_name, 'wb') as writeFile:
             writeFile.write(request.content.read())
@@ -178,6 +179,21 @@ class FileResource(Resource):
         cur.execute(updated)
         self.db.commit()
         request.write('received')
+        request.finish()
+        return NOT_DONE_YET
+
+    def render_DELETE(self, request):
+        file_name_raw = request.args['filename'][0]
+        username = request.args['username'][0]
+        cur = self.db.cursor()
+        user_id = int(db_access.get_id(username, self.db))
+        killswitch = "DELETE FROM user_files WHERE user_id='%(uid)d' AND file='%(filename)s'" % {'uid': user_id,
+                                                                                                 'filename': file_name_raw}
+        cur.execute(killswitch)
+        self.db.commit()
+        directory = "./files/%s/" % request.args['username'][0]
+        print directory + file_name_raw + '*'
+        call("rm -rf " + directory + file_name_raw + '*', shell=True)
         request.finish()
         return NOT_DONE_YET
 
