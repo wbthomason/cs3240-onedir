@@ -48,7 +48,8 @@ if __name__ == "__main__":
         if 'start' == sys.argv[1]:
             email = raw_input("Email: ")
             password = getpass("Password: ")
-            user = User(email, password, sys.argv[2])
+            addr = raw_input("Server Address: ")
+            user = User(email, password, sys.argv[2], addr)
             daemon = Sauron(user)
             daemon.start()
         elif 'stop' == sys.argv[1]:

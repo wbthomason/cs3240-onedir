@@ -15,7 +15,7 @@ def check_updates(time, user):
 
 
 def get_files(last_check, user):
-    url = "http://localhost:3240/check"
+    url = "http://%s:3240/check" % user.addr
     print "CHECKING AT TIME %f" % last_check
     args = {'email': user.email, 'last_check': float(last_check)}
     r = requests.get(url, params=args, verify=False)
@@ -30,7 +30,7 @@ def download_files(files, user):
     key = h.digest()[:32]
     for file_name in files:
         local_file = user.dir + file_name
-        fileurl = "http://localhost:3240/files"
+        fileurl = "http://%s:3240/files" % user.addr
         print "downloading file " + file_name
         filereq = requests.get(fileurl, params={'filename': file_name, 'username': user.email}, stream=True,
                                verify=False)
@@ -57,7 +57,7 @@ def upload_file(file_name, file_size, user):
     h = SHA512.new()
     h.update(bytes(user.password))
     key = h.digest()[:32]
-    url = 'http://localhost:3240/files'
+    url = 'http://%s:3240/files' % user.addr
     params = {'filename': file_name[len(user.dir):], 'username': user.email, 'filesize': file_size}
     put_file = cryption.encrypt(key, file_name)
     put_file.seek(0)
@@ -66,7 +66,7 @@ def upload_file(file_name, file_size, user):
 
 
 def file_delete(file_name, user):
-    url = 'http://localhost:3240/files'
+    url = 'http://%s:3240/files' % user.addr
     params = {'filename': file_name[len(user.dir):], 'username': user.email}
     req = requests.delete(url, params=params, verify=False)
     req.raise_for_status()
