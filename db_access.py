@@ -43,7 +43,11 @@ def login(email, password, db):
     cur.execute(get_login)
     res = cur.fetchone()
     hashed = "" if res is None else res[0]
-    return bcrypt.hashpw(password, hashed) == hashed
+    try:
+        success = (bcrypt.hashpw(password, hashed) == hashed)
+    except:
+        success = False
+    return success
 
 
 def get_dirs(email, db):
