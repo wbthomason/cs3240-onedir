@@ -36,6 +36,7 @@ class UserResource(Resource):
             print "Doing auth stuff! Got data: %s, %s" % (email, passw)
             if not db_access.login(email, passw, self.db):
                 return json.dumps({'auth_key': 0})
+
         elif urlparts[-1] == 'create':
             # Same as above
             email = request.args['email'][0]
@@ -126,20 +127,18 @@ class FileResource(Resource):
         version = int(db_access.get_version(username, file_name_raw, self.db))
 
         file_parts = file_name_raw.split(".")
+        if len(file_parts) == 1:
+            file_parts.append('')
+            # Add the version number
+        file_parts[-1] = str(version)
 
-        # Make room for the version number
-        file_parts.append( file_parts[-1] )
-
-        # Add the version number
-        file_parts[-2] = str(version)
-
-        # Python is a beautful, terrifying language
+        # Python is a beautiful, terrifying language
         file_name = "."
         file_name = file_name.join(file_parts)
 
 
         request.setHeader('Content-Length', os.stat(directory + file_name).st_size)
-        with open("./files/%s/%s" % (username, file_name, 'rb') as readFile:
+        with open("./files/%s/%s" % (username, file_name), 'rb') as readFile:
             request.write(readFile.read())
 
         request.finish()
@@ -149,25 +148,23 @@ class FileResource(Resource):
     def render_PUT(self, request):
         file_name_raw = request.args['filename'][0]
         username = request.args['username'][0]
+        dir = bool(request.args['dir'][0])
 
         # Get the version number, increment it by 1, and secretly make that the file name
         version = int(db_access.get_version(username, file_name_raw, self.db))
 
         file_parts = file_name_raw.split(".")
-
-        # Make room for the version number
-        file_parts.append( file_parts[-1] )
-
-        # Add the version number
-        file_parts[-2] = str(version+1)
+        if len(file_parts) == 1:
+            file_parts.append('')
+            # Add the version number
+        file_parts[-1] = str(version + 1)
 
         # Python is a beautful, terrifying language
         file_name = "."
         file_name = file_name.join(file_parts)
 
         # Update the DB with current version
-        db_access.inc_version(email, file_name_raw, version, self.db)
-
+        db_access.inc_version(username, file_name_raw, version, self.db)
 
         directory = "./files/%s/" % request.args['username'][0]
         if not os.path.exists(directory):
@@ -182,7 +179,7 @@ class FileResource(Resource):
 
         updated = "INSERT INTO user_files (user_id, file, size, last_update) VALUES ('%(uid)d', '%(file)s', '%(size)d', '%(time)f') " \
                   "ON DUPLICATE KEY UPDATE last_update='%(time)f', size='%(size)d'" \
-                  % {'uid': user_id, 'file': file_name, 'size': file_size, 'time': time.time()}
+                  % {'uid': user_id, 'file': file_name_raw, 'size': file_size, 'time': time.time()}
         # "UPDATE user_files SET last_update='%f' WHERE file='%s' AND user_id='%d'" % (time.time(), file_name, user_id)
         cur.execute(updated)
         self.db.commit()

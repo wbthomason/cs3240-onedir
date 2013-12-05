@@ -1,11 +1,10 @@
 from urllib2 import HTTPError
 import cStringIO
+import os
 
 import requests
 from Crypto.Hash import SHA512
-import os
 
-from add_file import *
 import cryption
 
 
@@ -47,11 +46,26 @@ def download_files(files, user):
 def file_upload(file_path, user):
     try:
         file_size = os.stat(file_path).st_size
-        upload_file(file_path, file_size, user)
+        upload_file(file_path, file_size, user, False)
         print file_path + " pushed to server"
 
     except HTTPError as e:
         print e.reason()
+
+
+def upload_file(file_name, file_size, user, isdir):
+    h = SHA512.new()
+    h.update(bytes(user.password))
+    key = h.digest()[:32]
+    url = 'http://localhost:3240/files'
+    params = {'filename': file_name[len(user.dir):], 'username': user.email, 'filesize': file_size, 'dir': isdir}
+    if not isdir:
+        put_file = cryption.encrypt(key, file_name)
+        put_file.seek(0)
+    else:
+        put_file = None
+    req = requests.put(url, data=put_file, params=params, verify=False)
+    req.raise_for_status()
 
 
 def file_delete(file_path, user):

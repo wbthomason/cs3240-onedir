@@ -9,19 +9,12 @@ class DirectoryWatcher(FileSystemEventHandler):
         self.flag = flag
 
     def on_created(self, event):
-        if not event.is_directory:
-            # Commenting this because it causes double-uploads
-            pass   # file_upload(event.src_path, self.user)
-        else:
-            # Do we need to handle directories?
-            pass
+        if event.is_directory and not self.flag.is_set():
+            upload_file(event.src_path, 0, self.user, True)
 
     def on_deleted(self, event):
-        if not event.is_directory and not self.flag.is_set():
+        if not self.flag.is_set():
             file_delete(event.src_path)
-        else:
-            # Do we need to handle directories?
-            pass
 
     def on_modified(self, event):
         if not event.is_directory and not self.flag.is_set():

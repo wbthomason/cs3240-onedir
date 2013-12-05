@@ -21,7 +21,7 @@ def update_account(old_email, old_password, new_email, new_password, db):
     cur = db.cursor()
 
     update_user = "UPDATE local_users SET email='%s', password='%s' WHERE email='%s'" % (
-    new_email, new_password, old_email)
+        new_email, new_password, old_email)
     cur.execute(update_user)
     db.commit()
     return True
@@ -42,8 +42,8 @@ def login(email, password, db):
     get_login = "SELECT password FROM local_users WHERE email='%s'" % (email)
     cur.execute(get_login)
     res = cur.fetchone()
-
-    return bcrypt.hashpw(password, res[0]) == res[0]
+    hashed = "" if res is None else res[0]
+    return bcrypt.hashpw(password, hashed) == hashed
 
 
 def get_dirs(email, db):
@@ -89,7 +89,7 @@ def add_dir(email, dir, db):
 def get_files(email, db):
     cur = db.cursor()
 
-    get_files = "SELECT file, size FROM user_files WHERE user_id='%s'" % ( get_id(email, db) )
+    get_files = "SELECT file, size FROM user_files WHERE user_id='%s'" % (get_id(email, db))
     cur.execute(get_files)
     res = cur.fetchall()
 
@@ -99,18 +99,21 @@ def get_files(email, db):
 
     return files
 
+
 def get_version(email, file_name, db):
     cur = db.cursor()
-    version = "SELECT version FROM user_files WHERE user_id='%s' AND file='%s'" % ( get_id(email, db), file_name )
+    version = "SELECT version FROM user_files WHERE user_id='%s' AND file='%s'" % (get_id(email, db), file_name)
 
     cur.execute(version)
     res = cur.fetchone()
 
-    return res[0]
+    return 0 if res is None else res[0]
+
 
 def inc_version(email, file_name, version, db):
     cur = db.cursor()
-    inc = "UPDATE user_files SET version='%d' WHERE user_id='%s' AND file='%s'" % (version + 1, get_id(email, db), file_name)
+    inc = "UPDATE user_files SET version='%d' WHERE user_id='%s' AND file='%s'" % (
+        version + 1, get_id(email, db), file_name)
 
     cur.execute(inc)
     db.commit()
@@ -128,6 +131,7 @@ def add_file(email, filename, db):
     file_add = "UPDATE local_users SET files='%s' WHERE email='%s'" % (all_files, email)
     cur.execute(file_add)
     db.commit()
+
 
 # Admin commands
 
