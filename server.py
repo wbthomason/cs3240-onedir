@@ -54,6 +54,7 @@ class UserResource(Resource):
 
             if db_access.login(old_email, old_password, self.db):
                 db_access.update_account(old_email, old_password, new_email, new_password, self.db)
+                print "mv " + "./files/%s" % old_email + " ./files/%s" % new_email
                 call("mv " + "./files/%s" % old_email + " ./files/%s" % new_email)
 
         elif urlparts[-1] == 'delete':

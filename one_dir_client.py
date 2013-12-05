@@ -31,12 +31,6 @@ if __name__ == "__main__":
     print ""
     print "##########################"
 
-    db = db_access.connect()
-    ver = int(db_access.get_version("knox.dru@gmail.com", "test.txt", db))
-    print ver
-    db_access.inc_version("knox.dru@gmail.com", "test.txt", ver, db)
-    print db_access.get_version("knox.dru@gmail.com", "test.txt", db)
-
     # A quick note on security in this code:
     # The security here is designed as a proof of possibility, 
     # and SHOULD NOT EVER be used in a scenario which needs actual 
