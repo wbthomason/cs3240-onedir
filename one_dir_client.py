@@ -30,11 +30,14 @@ if __name__ == "__main__":
 
     print ""
     print "##########################"
+    print ""
 
     # A quick note on security in this code:
     # The security here is designed as a proof of possibility, 
     # and SHOULD NOT EVER be used in a scenario which needs actual 
     # security. The same holds for the entire project.
+
+    host = raw_input("Host: ")
 
     while True:
         print ""
@@ -50,7 +53,6 @@ if __name__ == "__main__":
         if command == "login":
             email = raw_input("Email: ")
             password = getpass.getpass("Password: ")
-            host = raw_input("Host: ")
             user = User(email, password, '', host)
             if user.login():
                 print "Login successful!"
@@ -92,10 +94,10 @@ if __name__ == "__main__":
             password_confirm = getpass.getpass("Confirm Password: ")
             while password != password_confirm:
                 print "Passwords do no match"
-                password = raw_input("Password: ")
-                password_confirm = raw_input("Confirm Password: ")
+                password = getpass.getpass("Password: ")
+                password_confirm = getpass.getpass("Confirm Password: ")
 
-            user = User(email, password, '')
+            user = User(email, password, '', host)
             user.create(bcrypt.hashpw(password, bcrypt.gensalt(10)))
 
         elif command == "users":
@@ -103,7 +105,7 @@ if __name__ == "__main__":
                 print "Must have admin privileges"
                 continue
 
-            print admin.list_users(user.password)
+            print admin.list_users(user.password, host)
 
         elif command == "change":
             if not user.email == 'admin':
@@ -114,7 +116,7 @@ if __name__ == "__main__":
             new_email = raw_input("New Email: ")
             new_password = getpass.getpass("New Password: ")
 
-            admin.update_user(user.password, old_email, new_email, bcrypt.hashpw(new_password, bcrypt.gensalt(10)))
+            admin.update_user(user.password, old_email, new_email, bcrypt.hashpw(new_password, bcrypt.gensalt(10)), host)
 
         elif command == "files":
             if not user.email == 'admin':
@@ -136,7 +138,7 @@ if __name__ == "__main__":
 
             email = raw_input("Email: ")
 
-            admin.remove(user.password, email)
+            admin.remove(user.password, email, host)
 
         elif command == "quit":
             break
