@@ -3,6 +3,7 @@ import bcrypt
 from user import User
 import admin
 import db_access
+import getpass
 
 
 if __name__ == "__main__":
@@ -54,7 +55,7 @@ if __name__ == "__main__":
 
         if command == "login":
             email = raw_input("Email: ")
-            password = raw_input("Password: ")
+            password = getpass.getpass("Password: ")
             user = User(email, password, '')
             if user.login():
                 print "Login successful!"
